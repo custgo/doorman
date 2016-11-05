@@ -1,0 +1,15 @@
+{
+	"Listen": ":6252",
+	"TokenEndpoint": "/token",
+	"LoginEndpoint": "/doorman-login",
+	"LoginRequestes": {
+		"127.0.0.1:6252": {
+			"Method": "POST",
+			"Url": "http://127.0.0.1:6252/testLogin?url={redirectUrl}",
+			"Header": {
+				"Content-Type": ["application/x-www-form-urlencoded"]
+			},
+			"Body": "username={username}&password={password}"
+		}
+	}
+}
