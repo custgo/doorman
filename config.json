@@ -2,6 +2,17 @@
 	"Listen": ":6252",
 	"TokenEndpoint": "/token",
 	"LoginEndpoint": "/doorman-login",
+	
+	"logs": {
+		"types": ["debug", "info", "warn", "error"],
+		"files": {
+			"{AppPath}/info.log": ["debug", "info", "warn"],
+			"{AppPath}/error.log": ["error"],
+			"STDOUT": ["debug", "info", "warn"],
+			"STDERR": ["error"]
+		} 
+	},
+	
 	"LoginRequestes": {
 		"127.0.0.1:6252": {
 			"Method": "POST",
