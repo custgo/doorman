@@ -4,9 +4,9 @@
 	"LoginEndpoint": "/doorman-login",
 	
 	"LoginRequestes": {
-		"127.0.0.1:6252": {
+		"example.com": {
 			"Method": "POST",
-			"Url": "http://127.0.0.1:6252/testLogin?url={redirectUrl}",
+			"Url": "http://example.com/login?url={redirectUrl}",
 			"Header": {
 				"Content-Type": ["application/x-www-form-urlencoded"]
 			},
