@@ -2,12 +2,12 @@ package main
 
 import (
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
 
 	"github.com/gorilla/mux"
+	"github.com/heiing/logs"
 )
 
 func LoginHandler(rw http.ResponseWriter, req *http.Request) {
@@ -15,13 +15,14 @@ func LoginHandler(rw http.ResponseWriter, req *http.Request) {
 	identity := tokenPool.Get(token)
 	if nil == identity {
 		rw.WriteHeader(401)
+		logs.Info("[Access] token ", token, " not found, return 401")
 		return
 	}
 
 	hostConfig, exists := config.LoginRequestes[req.Host]
 	if !exists {
-		log.Println("host config NOT FOUND:", req.Host)
 		rw.WriteHeader(404)
+		logs.Info("[Access] host config NOT FOUND: ", req.Host, ", return 404")
 		return
 	}
 
@@ -33,33 +34,40 @@ func LoginHandler(rw http.ResponseWriter, req *http.Request) {
 	body := parseTemplate(hostConfig.Body, username, password, redirectUrl)
 
 	request, _ := http.NewRequest(hostConfig.Method, targetUrl, strings.NewReader(body))
+	logs.Debug("[HTTP][Request] ", hostConfig.Method, " ", targetUrl, " ", request.Proto)
 	for headerName, headerValues := range hostConfig.Header {
 		for _, headerValue := range headerValues {
 			request.Header.Add(headerName, headerValue)
+			logs.Debug("[HTTP][Request] ", headerName, ": ", headerValue)
 		}
 	}
+	logs.Debug("[HTTP][Request] ", body)
 
 	client := &http.Client{
 		CheckRedirect: StopRedirect,
 	}
 	res, err := client.Do(request)
 	if err != nil {
-		log.Println("[HTTP] Login Error, Do Request Error: ", err)
+		logs.Error("[HTTP][Request] Login Error, Do Request Error: ", err)
 		return
 	}
 
+	logs.Debug("[HTTP][Response] ", res.Proto, " ", res.Status)
 	for headerName, headerValues := range res.Header {
 		for _, headerValue := range headerValues {
 			rw.Header().Add(headerName, headerValue)
+			logs.Debug("[HTTP][Response] ", headerName, ": ", headerValue)
 		}
 	}
 
 	rw.WriteHeader(res.StatusCode)
-	io.Copy(rw, res.Body)
+	resBody := readString(res.Body)
+	rw.Write([]byte(resBody))
+	logs.Debug("[HTTP][Response] ", resBody)
 }
 
+// 每次请求，都会生成不一样的 token
 func TokenHandler(rw http.ResponseWriter, req *http.Request) {
-	printRequest(req)
 	username := req.PostFormValue("username")
 	password := req.PostFormValue("password")
 	token := tokenPool.Add(username, password)

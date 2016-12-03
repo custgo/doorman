@@ -5,8 +5,9 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"os/exec"
 	"path/filepath"
+
+	"github.com/heiing/logs"
 )
 
 type LoginRequest struct {
@@ -21,23 +22,29 @@ type Config struct {
 	TokenEndpoint  string
 	LoginEndpoint  string
 	LoginRequestes map[string]LoginRequest
+	Logs           *logs.LogsConfig
 }
 
-var DefaultConfig = Config{
+var defaultConfig = Config{
 	Listen:         ":6252",
 	TokenEndpoint:  "/token",
 	LoginEndpoint:  "/doorman-login",
 	LoginRequestes: make(map[string]LoginRequest),
+	Logs: &logs.LogsConfig{
+		Types: []string{"info", "warn", "error"},
+		Files: map[string][]string{
+			"STDOUT": []string{"info", "warn"},
+			"STDERR": []string{"error"},
+		},
+	},
 }
 
-var execPath string
-
-func ReadConfig() (Config, error) {
+func readConfig() (Config, error) {
 	var configFile string
 	if len(os.Args) > 1 {
 		configFile = os.Args[1]
 	} else {
-		configFile = filepath.Join(GetExecPath(), "config.json")
+		configFile = filepath.Join(logs.GetExecPath(), "config.json")
 	}
 	return readConfigFile(configFile)
 }
@@ -47,7 +54,7 @@ func readConfigFile(configFile string) (Config, error) {
 	file, err := os.Open(configFile)
 	if err != nil {
 		log.Println("[Config] open config file error: ", err)
-		return DefaultConfig, err
+		return defaultConfig, err
 	}
 	decoder := json.NewDecoder(file)
 	config := Config{}
@@ -59,23 +66,15 @@ func readConfigFile(configFile string) (Config, error) {
 	return mergeConfig(config), nil
 }
 
-func GetExecPath() string {
-	if "" == execPath {
-		execFile, _ := exec.LookPath(os.Args[0])
-		execPath = filepath.Dir(execFile)
-	}
-	return execPath
-}
-
 func mergeConfig(config Config) Config {
 	if "" == config.Listen {
-		config.Listen = DefaultConfig.Listen
+		config.Listen = defaultConfig.Listen
 	}
 	if "" == config.LoginEndpoint {
-		config.LoginEndpoint = DefaultConfig.LoginEndpoint
+		config.LoginEndpoint = defaultConfig.LoginEndpoint
 	}
 	if "" == config.TokenEndpoint {
-		config.TokenEndpoint = DefaultConfig.TokenEndpoint
+		config.TokenEndpoint = defaultConfig.TokenEndpoint
 	}
 	return config
 }

@@ -1,5 +1,10 @@
 package main
 
+//
+// add token:
+// curl -v -d "username=yourname&password=yourpasswd" http://yourhost/token
+//
+
 import (
 	"io/ioutil"
 	"net/http"
@@ -7,10 +12,13 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/heiing/logs"
 )
 
+// 测试示例，需要适当修改才能运行
 func TestMain(t *testing.T) {
-	config, _ := readConfigFile(filepath.Join(GetExecPath(), "config.json"))
+	config, _ := readConfigFile(filepath.Join(logs.GetExecPath(), "config.json"))
 	baseUrl := "http://127.0.0.1" + config.Listen
 	body := strings.NewReader("username=hzm&password=123")
 	res1, err := http.Post(baseUrl+config.TokenEndpoint, "application/x-www-form-urlencoded", body)
@@ -42,7 +50,6 @@ func TestMain(t *testing.T) {
 		t.Fatal("Error: nil Response")
 	}
 
-	printResponse(res2)
 	if 302 != res2.StatusCode {
 		t.Fatal("Expect", 302, "Actual", res2.StatusCode)
 	}
