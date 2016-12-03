@@ -96,11 +96,11 @@ doorman 适用于使用用户名密码登录的 HTTP 系统，特别适用于登
 
 假定你拥有的系统如下：
 
-- 协同办公系统，地址为 http://oa.example.com，登录请求地址为：
-  http://oa.example.com/login.jsp，服务监听地址为 192.168.1.10:8010
-- 客户关系管理系统，地址为 http://crm.example.com，登录请求地址为：
-  http://crm.example.com/login.php，服务监听地址为 192.168.1.20:8020
-- 员工中心，地址为 http://my.example.com，登录请求地址为：
+- 协同办公系统，地址为 http://oa.example.com ，登录请求地址为：
+  http://oa.example.com/login.jsp ，服务监听地址为 192.168.1.10:8010
+- 客户关系管理系统，地址为 http://crm.example.com ，登录请求地址为：
+  http://crm.example.com/login.php ，服务监听地址为 192.168.1.20:8020
+- 员工中心，地址为 http://my.example.com ，登录请求地址为：
   http://my.example.com/login
 
 现在希望当员工登录员工中心后，能在员工中心单点登录到 oa 与 crm 系统。
@@ -204,3 +204,5 @@ doorman 适用于使用用户名密码登录的 HTTP 系统，特别适用于登
 - http://crm.example.com/doorman-login?token=22e86969ee47cc4d4a0e6a5a12149867d6820100
 
 当用户在员工中心点击这两个链接之后，即可登录 oa 与 crm。
+
+如果你的员工中心不方便修改代码实现上述功能怎么办？自己想想办法咯~
